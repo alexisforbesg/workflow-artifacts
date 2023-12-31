@@ -35,5 +35,15 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      # download artifacts
+      # they exist in a different machine
+      - name: Get build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: dist-files
+      - name: Output contents
+        # lists all items in the folder we currently are
+        run: ls
       - name: Deploy project
+        # takes artifacts and uploads them to a hosting provider
         run: echo "Deploying..."
