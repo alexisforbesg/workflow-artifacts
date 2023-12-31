@@ -9,6 +9,18 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v3
+      # cache dependencies to not install if nothing has changed
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          # cached paths to files that should be cached
+          # the npm created cache running npm ci should be stored in some github server and reused in other jobs
+          path: ~/.npm
+          # used for retrieving cache and recreating folder on the runner machine
+          # indicates if it should be discarted or recreated if some dependency changed
+          # creates unique hash value based on path provided
+          # will change when contents change
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
         run: npm ci
       - name: Lint code
@@ -26,6 +38,12 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v3
+      - name: Cache dependencies
+        # it uses the same central cache directory for each job to be reused across execution cycles
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
         run: npm ci
       - name: Build website
